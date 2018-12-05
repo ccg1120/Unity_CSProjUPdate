@@ -95,15 +95,6 @@ namespace Choe
         }
       
         #region SetRootdata
-        public static void SetUnityRootPath(int index, string path)
-        {
-            if(RootDataSet.RootPathList.Count < index)
-            {
-                Debug.LogError("SetRootPath Faile");
-                return;
-            }
-            RootDataSet.RootPathList[index].UnityRootPath = path;
-        }
         public static void SetCSProjectPath(int index, string path)
         {
             if (RootDataSet.RootPathList.Count < index)
@@ -352,9 +343,9 @@ namespace Choe
 
             for (int subindex = 0; subindex < pathlistlenght; subindex++)
             {
-                Debug.Log(RootDataSet.RootPathList[subindex].UnityRootPath);
+                Debug.Log(RootDataSet.RootPathList[subindex].CSBaseUnityCommonPath);
                 Debug.Log(RootDataSet.RootPathList[subindex].CSProjectRootPath);
-                TransferUnityToCSDirectory(RootDataSet.RootPathList[subindex].UnityRootPath, RootDataSet.RootPathList[subindex].CSProjectRootPath);
+                TransferUnityToCSDirectory(RootDataSet.RootPathList[subindex].CSBaseUnityCommonPath, RootDataSet.RootPathList[subindex].CSProjectRootPath);
             }
         }
 
@@ -572,7 +563,6 @@ namespace Choe
         [System.Serializable]
         public class RootPath
         {
-            public string UnityRootPath = string.Empty;
             public string CSProjectPath = string.Empty;
             public string CSProjectRootPath = string.Empty;
             public string CSBaseUnityCommonPath = string.Empty;

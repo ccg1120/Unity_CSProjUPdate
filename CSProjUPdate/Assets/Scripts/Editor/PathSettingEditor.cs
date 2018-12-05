@@ -67,15 +67,7 @@ namespace Choe
         private void RootPathDataSettingUIMenuByIndex(int index)
         {
             GUILayout.BeginVertical("HelpBox");
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(" Unity Root Path : " + Parser.GetRootPathByIndex(index).UnityRootPath);
-            if(GUILayout.Button("Open"))
-            {
-                string UnityRootPath = EditorUtility.OpenFolderPanel("UnityRootPath", Parser.UnityDataPath, "");
-                Parser.GetRootPathByIndex(index).UnityRootPath = UnityRootPath;
-            }
-            GUILayout.EndHorizontal();
+        
             GUILayout.BeginHorizontal();
             GUILayout.Label(" Unity CSProject Path : " + Parser.GetRootPathByIndex(index).CSProjectPath);
             if (GUILayout.Button("Open"))
