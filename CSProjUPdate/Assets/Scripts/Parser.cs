@@ -352,6 +352,8 @@ namespace Choe
 
             for (int subindex = 0; subindex < pathlistlenght; subindex++)
             {
+                Debug.Log(RootDataSet.RootPathList[subindex].UnityRootPath);
+                Debug.Log(RootDataSet.RootPathList[subindex].CSProjectRootPath);
                 TransferUnityToCSDirectory(RootDataSet.RootPathList[subindex].UnityRootPath, RootDataSet.RootPathList[subindex].CSProjectRootPath);
             }
         }
