@@ -376,18 +376,6 @@ namespace Choe
                 TransferUnityToCSDirectory(subinfos[subindex].FullName, createcopypath);
             }
         }
-        private void TrandferUnityToCSDirectory(DirectoryInfo info)
-        {
-
-            DirectoryInfo[] subinfos = info.GetDirectories();
-            int subdinfolenght = subinfos.Length;
-
-            for (int subindex = 0; subindex < subdinfolenght; subindex++)
-            {
-
-            }
-        }
-
 
 
         /// <summary>
