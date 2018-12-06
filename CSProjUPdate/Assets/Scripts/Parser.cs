@@ -332,7 +332,6 @@ namespace Choe
 
                         for (int deleteindex = 0; deleteindex < deletefilearray.Length; deleteindex++)
                         {
-                            Debug.Log("delete Item node name " + deletefilearray[deleteindex]);
                             if (convertunitynodename.Contains(deletefilearray[deleteindex]))
                             {
                                 deleteindexlist.Add(index);
@@ -342,15 +341,10 @@ namespace Choe
 
                         for (int moveindex = 0; moveindex < movefilearray.Length; moveindex++)
                         {
-                            Debug.Log("delete Item node name " + movefilearray[moveindex]);
-
                             if (convertunitynodename.Contains(movepathfilearray[moveindex]))
                             {
-                                string winpath = ConvertWindowPathDirectorySeparatorChar(movefilearray[moveindex]);
-
-                                attributes[attindex].Value = Path.Combine(DefaultPath, winpath); ;
-                                string link = GetPathWithOutCommonPath(unitycommonpath, movefilearray[moveindex]);
-                                nodechildlist[index].InnerText = link;
+                                deleteindexlist.Add(index);
+                                break;
                             }
                         }
                     }
@@ -359,8 +353,6 @@ namespace Choe
                 {
                     itemnode.RemoveChild(nodechildlist[deleteindexlist[listindex]]);
                 }
-
-
             }
             else
             {
