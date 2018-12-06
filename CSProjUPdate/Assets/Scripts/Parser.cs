@@ -345,7 +345,11 @@ namespace Choe
             {
                 Debug.Log(RootDataSet.RootPathList[subindex].CSBaseUnityCommonPath);
                 Debug.Log(RootDataSet.RootPathList[subindex].CSProjectRootPath);
-                TransferUnityToCSDirectory(RootDataSet.RootPathList[subindex].CSBaseUnityCommonPath, RootDataSet.RootPathList[subindex].CSProjectRootPath);
+                if(!RootDataSet.RootPathList[subindex].CSBaseUnityCommonPath.Equals(string.Empty) &&
+                    !RootDataSet.RootPathList[subindex].CSProjectRootPath.Equals(string.Empty))
+                {
+                    TransferUnityToCSDirectory(RootDataSet.RootPathList[subindex].CSBaseUnityCommonPath, RootDataSet.RootPathList[subindex].CSProjectRootPath);
+                }
             }
         }
 

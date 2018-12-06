@@ -16,7 +16,7 @@ namespace Choe
 
         }
 
-        [MenuItem("Test/Test")]
+        [MenuItem("Tool/CSProj Setting")]
         public static void ShowMenu()
         {
             ShowWindow();
