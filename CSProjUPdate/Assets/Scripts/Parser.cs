@@ -83,9 +83,9 @@ namespace Choe
         }
         public static string RootDataSetToJson()
         {
-            Debug.Log("RootDataSetToJson count : " + RootDataSet.RootPathList.Count);
+            //Debug.Log("RootDataSetToJson count : " + RootDataSet.RootPathList.Count);
             string json = JsonUtility.ToJson(RootDataSet);
-            Debug.Log("RootDataSetToJson : Json : "+ json);
+            //Debug.Log("RootDataSetToJson : Json : "+ json);
             return json;
         }
         public static void RootDataSetFromJson(string json)
@@ -171,15 +171,43 @@ namespace Choe
         {
             return RootDataSet.RootPathList.Count;
         }
-
+        
         static void OnPostprocessAllAssets(
             string[] importedAssets, string[] deletedAssets,
             string[] movedAssets, string[] movedFromAssetPaths)
         {
+            Debug.Log("Delete Asset List_______________");
+            for (int index = 0; index < deletedAssets.Length; index++)
+            {
+                Debug.Log(index + ", name : "+ deletedAssets[index]);
+            }
+            Debug.Log("Delete Asset List______END______");
+
+            Debug.Log("imported Assets  List_______________");
+            for (int index = 0; index < importedAssets.Length; index++)
+            {
+                Debug.Log(index + ", name : " + importedAssets[index]);
+            }
+            Debug.Log("imported Asset List______END______");
+
+            Debug.Log("moved Assets  List_______________");
+            for (int index = 0; index < movedAssets.Length; index++)
+            {
+                Debug.Log(index + ", name : " + movedAssets[index]);
+            }
+            Debug.Log("moved Asset List______END______");
+
+            Debug.Log("movedFrom Assets  List_______________");
+            for (int index = 0; index < movedFromAssetPaths.Length; index++)
+            {
+                Debug.Log(index + ", name : " + movedFromAssetPaths[index]);
+            }
+            Debug.Log("movedFrom Asset List______END______");
 
             LoadorCreate();
 
             CheckCSDirAndCreate();
+
 
             if (RootDataSet == null)
             {
@@ -188,28 +216,21 @@ namespace Choe
             }
 
             Debug.Log(importedAssets.Length);
-            string[] csfilenameArray = FindCSFileNameArry(importedAssets);
-            if (csfilenameArray.Length == 0)
+
+            string[] importcsfilenameArray = FindCSFileNameArry(importedAssets);
+            string[] deleteCSfilenamearray = FindCSFileNameArry(deletedAssets);
+            string[] moveCSfilenamearray = FindCSFileNameArry(movedAssets);
+            string[] movepahtCSfilenamearray = FindCSFileNameArry(movedFromAssetPaths);
+
+            int setlenght = RootDataSet.RootPathList.Count;
+            Debug.Log("RootDataSet list Count = "+ setlenght);
+            for (int listindex = 0; listindex < setlenght; listindex++)
             {
-                Debug.Log("CS File null");
-
-            }
-            else
-            {
-                for (int index = 0; index < csfilenameArray.Length; index++)
-                {
-                    Debug.Log(csfilenameArray[index]);
-                }
-
-                int setlenght = RootDataSet.RootPathList.Count;
-                Debug.Log("RootDataSet list Count = "+ setlenght);
-                for (int listindex = 0; listindex < setlenght; listindex++)
-                {
-                    GetCSPROJData(listindex, csfilenameArray);
-                }
-
+                GetCSPROJData(listindex, importcsfilenameArray, deleteCSfilenamearray, moveCSfilenamearray, movepahtCSfilenamearray);
             }
         }
+
+        
 
         /// <summary>
         /// 린큐 사용법으로 그냥 둠
@@ -243,7 +264,8 @@ namespace Choe
 
             return result.ToArray();
         }
-        private static void GetCSPROJData(int num, string[] csfilearray)
+
+        private static void GetCSPROJData(int num, string[] importcsfilearray, string[] deleteCSfilearray, string[] moveCSfilearray, string[] movepathCSfilearray)
         {
 
             var csprojdata = new XmlDocument();
@@ -255,7 +277,11 @@ namespace Choe
             Debug.Log("CommonPath : " + commonpath);
             string unitycommonpath = GetUnityCommonPath(commonpath, DefaultPath);
             
-            string[] addfilearray = GetAddFileArrayByCommonPath(unitycommonpath, csfilearray);
+            string[] addfilearray = GetAddFileArrayByCommonPath(unitycommonpath, importcsfilearray);
+            string[] deletefilearray = GetAddFileArrayByCommonPath(unitycommonpath, deleteCSfilearray);
+            string[] movefilearray = GetAddFileArrayByCommonPath(unitycommonpath, moveCSfilearray);
+            string[] movepathfilearray = GetAddFileArrayByCommonPath(unitycommonpath, movepathCSfilearray);
+
 
             Debug.Log("addfilearray lenght" + addfilearray.Length);
             int childcount = csprojdata.DocumentElement.ChildNodes.Count;
@@ -278,7 +304,7 @@ namespace Choe
 
             XmlNode copylastnode = null;
             //공통 경로 추출용 임시 리스트
-            List<string> tempattributelist = new List<string>();
+            //List<string> tempattributelist = new List<string>();
             if (itemnode != null)
             {
                 //마지막 노드 복사 및 제거 
@@ -290,18 +316,51 @@ namespace Choe
                 XmlNodeList nodechildlist = itemnode.ChildNodes;
                 int nodechildcount = nodechildlist.Count;
                 Debug.Log("Child Count : " + nodechildcount);
+                List<int> deleteindexlist = new List<int>();
 
                 for (int index = 0; index < nodechildcount; index++)
                 {
+                    //TODO : 삭제, 이동이 있는 경우 제거 및 변경 작업 필요
                     Debug.Log("Item node name " + nodechildlist[index].Name);
                     XmlAttributeCollection attributes = nodechildlist[index].Attributes;
                     int attcount = attributes.Count;
                     for (int attindex = 0; attindex < attcount; attindex++)
                     {
                         Debug.Log("Item node name " + attributes[attindex].Value);
-                        tempattributelist.Add(attributes[attindex].Value);
+                        string convertunitynodename = ConvertUnityPathDirectorySeparatorChar(attributes[attindex].Value);
+                        Debug.Log("Convert Item node name " + convertunitynodename);
+
+                        for (int deleteindex = 0; deleteindex < deletefilearray.Length; deleteindex++)
+                        {
+                            Debug.Log("delete Item node name " + deletefilearray[deleteindex]);
+                            if (convertunitynodename.Contains(deletefilearray[deleteindex]))
+                            {
+                                deleteindexlist.Add(index);
+                                break;
+                            }
+                        }
+
+                        for (int moveindex = 0; moveindex < movefilearray.Length; moveindex++)
+                        {
+                            Debug.Log("delete Item node name " + movefilearray[moveindex]);
+
+                            if (convertunitynodename.Contains(movepathfilearray[moveindex]))
+                            {
+                                string winpath = ConvertWindowPathDirectorySeparatorChar(movefilearray[moveindex]);
+
+                                attributes[attindex].Value = Path.Combine(DefaultPath, winpath); ;
+                                string link = GetPathWithOutCommonPath(unitycommonpath, movefilearray[moveindex]);
+                                nodechildlist[index].InnerText = link;
+                            }
+                        }
                     }
                 }
+                for (int listindex = 0; listindex < deleteindexlist.Count; listindex++)
+                {
+                    itemnode.RemoveChild(nodechildlist[deleteindexlist[listindex]]);
+                }
+
+
             }
             else
             {
@@ -371,8 +430,7 @@ namespace Choe
                 TransferUnityToCSDirectory(subinfos[subindex].FullName, createcopypath);
             }
         }
-
-
+       
         /// <summary>
         /// CS파일 이름 반환
         /// </summary>
@@ -515,6 +573,10 @@ namespace Choe
         private static string ConvertWindowPathDirectorySeparatorChar(string unitypath)
         {
             return unitypath.Replace('/', '\\');
+        }
+        private static string ConvertUnityPathDirectorySeparatorChar(string windowpath)
+        {
+            return windowpath.Replace('\\', '/');
         }
 
         private static string GetPathWithOutCommonPath(string commonPath, string fullpath)
